@@ -6,10 +6,10 @@ Android System print all logs into centralized files via logcat. Developers can 
 I developed the Android-Logger to solve the problem described above. For one thing, logs of an application are printed into files on sdcard with the directory of its own package name. For another thing, custom configurations can be made as you like.
 
 ### 1.2 Benefits
-Using Android-Logger, you can:
-1. print your logs into your own files on sdcard
-2. pull your log files easily from any android device
-3. upload your log files onto your servers for later analysis
+Using Android-Logger, you can:  
+1. print your logs into your own files on sdcard;  
+2. pull your log files easily from any android device;  
+3. upload your log files onto your servers for later analysis.
 
 ### 1.3 TODOs
 1. Encrypt the log files
