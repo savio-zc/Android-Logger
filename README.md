@@ -7,9 +7,9 @@ I developed the Android-Logger to solve the problem described above. For one thi
 
 ### 1.2 Benefits
 Using Android-Logger, you can:
-1. print your logs into your own files on sdcard;
-2. pull your log files easily from any android device;
-3. upload your log files onto your servers for later analysis.
+1. print your logs into your own files on sdcard
+2. pull your log files easily from any android device
+3. upload your log files onto your servers for later analysis
 
 ### 1.3 TODOs
 1. Encrypt the log files
@@ -76,7 +76,7 @@ public class LogUtil {
 LogManager.getInstance().init(config) should be called before anything else when use.
 
 ## 3 Design description
-### 3.1 System architecture
+### 3.1 System architecture  
 TODO
 
 ### 3.2 Core components
