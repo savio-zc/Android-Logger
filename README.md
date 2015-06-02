@@ -1,6 +1,6 @@
 # Android-Logger
 ## 1 User manual
-1.1 APIs
+### 1.1 APIs
 ```java
 public class LogManager {
     private static final LogManager INSTANCE = new LogManager();
@@ -29,7 +29,7 @@ public class LogManager {
 }
 ```
 
-1.2 Global configuration
+### 1.2 Global configuration
 ```java
  private void initLogManager() {
     LogManagerConfig config = new LogManagerConfig.Builder(this)
@@ -47,7 +47,7 @@ public class LogManager {
 }
 ```
  
-1.3 Sample
+### 1.3 Sample
 ```java
 public class LogUtil {
   	public static void d(String tag, String msg) {
@@ -56,15 +56,15 @@ public class LogUtil {
 }
 ```
 
-1.4 Notice
+### 1.4 Notice
 LogManager.getInstance().init(config) should be called before anything else when use.
 
 ## 2 Design description
-2.1 System architecture
+### 2.1 System architecture
 TODO
 
-2.2 Core components
-2.2.1 LogMessage: define the content of a log, including time, pid, tid, package name, module name, level and custom text.
+### 2.2 Core components
+#### 2.2.1 LogMessage: define the content of a log, including time, pid, tid, package name, module name, level and custom text.
 ```java
 public class LogMessage {
     
@@ -79,7 +79,7 @@ public class LogMessage {
 }
 ```
 
-2.2.2 Formatter: translate the log into formatted string.
+#### 2.2.2 Formatter: translate the log into formatted string.
 ```java
 public interface Formatter {
     public String format(LogMessage message);
@@ -88,7 +88,7 @@ public interface Formatter {
 DefaultFormatter is offered, which looks like the android logcat format.
 Custom formatter can be implemented as you like.
 
-2.2.3 Logger: print formatted string into console, file or anything.
+#### 2.2.3 Logger: print formatted string into console, file or anything.
 ```java
 public interface Logger {
 
@@ -108,7 +108,7 @@ public interface Logger {
 ConsoleLogger is offered to print log into console. FileLogger is offered to print log into file which can be pulled from android devices without root previlege.
 Custom logger can be implemented as you like.
 
-2.2.4 Log level：v, d, i, w, e, a
+#### 2.2.4 Log level：v, d, i, w, e, a
 ```java
 public class Config {
     // Level
@@ -122,7 +122,7 @@ public class Config {
 ```
 new level can be inserted into every two exsiting levels.
 
-2.2.5 Log module: describe a log belong to a certain module.
+#### 2.2.5 Log module: describe a log belong to a certain module.
 ```java
 public class LogModule {
     // Module Level
@@ -132,8 +132,8 @@ public class LogModule {
 }
 ```
 
-2.3 Everything is configurable
-2.3.1 Global configuration：system max level, system min level, module name, module max level, module min level, formatter, loggers, log file numbers, log file size.
+### 2.3 Everything is configurable
+#### 2.3.1 Global configuration：system max level, system min level, module name, module max level, module min level, formatter, loggers, log file numbers, log file size.
 ```java
 public class LogManagerConfig {
   // System Level
@@ -154,7 +154,7 @@ public class LogManagerConfig {
 }
 ```
 
-2.3.2 Local option: the level and module of the log to be printed.
+#### 2.3.2 Local option: the level and module of the log to be printed.
 ```java
 public class LogOption {
     // Level
