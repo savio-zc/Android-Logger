@@ -1,9 +1,9 @@
 # Android-Logger
 ## 1 Overview
 ### 1.1 Background
-Android System print all logs into centralized files via logcat. Developers can not pull their log files from android devices unless they have root previlege. But it is so common for a developer to find out the bugs only with the log files.
+All logs are printed into centralized files via logcat by android system. Developers can not pull their log files from android devices unless they have root previlege. But it is so common for a developer to find out bugs only with log files.
 
-I developed the Android-Logger to solve the problem described above. For one thing, logs of an application are printed into files on sdcard with the directory of its own package name. For another thing, custom configurations can be made as you like.
+I developed Android-Logger to solve the problem described above. For one thing, logs of an application are printed into files on sdcard with the directory of its own package name. For another thing, custom configurations can be made as you like.
 
 ### 1.2 Benefits
 Using Android-Logger, you can:  
@@ -13,62 +13,108 @@ Using Android-Logger, you can:
 
 ### 1.3 TODOs
 1. Encrypt the log files
-2. View the logs on phones, such as CatLog
 
-## 2 User manual
-### 2.1 APIs
-```java
-public class LogManager {
-    private static final LogManager INSTANCE = new LogManager();
-	private LogManager() {
-	}
-	public static LogManager getInstance() {
-		return INSTANCE;
-	}
-	public void init(LogManagerConfig config) {
-		mConfig = config;
-	}
-	public void v(String tag, String text) {
-	}
-	public void d(String tag, String text) {
-	}
-	public void i(String tag, String text) {
-	}
-	public void w(String tag, String text) {
-	}
-	public void e(String tag, String text) {
-	}
-	public void log(String text, LogOption local) {
-	}
-	public void log(String text, LogOption local, LogManagerConfig global) {
-	}
+## 2 Usage
+### 2.1 Download
+Use Gradle:
+```groovy
+dependencies {
+    compile 'com.github.savio-zc:Android-Logger:1.0.0'
 }
 ```
+or Maven:
+```xml
+<dependency>
+  <groupId>com.github.savio-zc</groupId>
+  <artifactId>Android-Logger</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
 
-### 2.2 Global configuration
+### 2.2 ProGuard
+No need to add any rules.
+
+### 2.3 How to use
+First, config LogManager in your Application class:
 ```java
- private void initLogManager() {
-    LogManagerConfig config = new LogManagerConfig.Builder(this)
-			.minLevel(Config.LEVEL_VERBOSE) // default
-			.maxLevel(Config.LEVEL_ASSERT) // default
-			.enableModuleFilter(true) // default
-			.addModule(new LogModule("SampleActivity", Config.LEVEL_INFO, Config.LEVEL_ERROR))
-			.addModule(new LogModule("SampleActivity2"))
-			.formatter(new DefaultFormatter()) // default
-			.setFileLevel(10) // default 10
-			.setFileSize(10000) // default
-			.writeLogs(false) // default, write logs of the library
-			.build();
-	LogManager.getInstance().init(config);
+public class HomeApplication extends Application {
+
+    private static final boolean DEBUG = true;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        initLogManager();// init LogManager before you use it to print log
+        LogUtil.writeLogs(DEBUG);
+    }
+
+    private void initLogManager() {
+        LogManagerConfig config = new LogManagerConfig.Builder(this)
+                .minLevel(Config.LEVEL_VERBOSE) // default, lowest log level is v
+                .maxLevel(Config.LEVEL_ASSERT) // default, highest log level is a
+                .enableModuleFilter(!DEBUG) // if false, all logs are printed; if true, only added module logs are printed
+                .addModule(new LogModule(SMTApplication.TAG))
+                .writeLogs(true) // display Logger internal logs
+                .setFileLevel(10) // create at most 10 log files
+                .setFileSize(100000) // create every log file smaller than 100000Byte
+                .addOnFileFullListener(new OnFileFullListener() {
+                    @Override
+                    public void onFileFull(File file) {
+                        // called in ui thread when one log file is full, you can upload it to your log server
+                    }
+                })
+                .formatter(new DefaultFormatter()) // log format is the same as adb logcat
+                .addLogger(new FileLogger()) // print log to file
+                .addLogger(new ConsoleLogger()) // print log to console
+                .build();
+        LogManager.getInstance().init(config);
+    }
 }
 ```
- 
-### 2.3 Sample
+Second, create a util class for log:
 ```java
 public class LogUtil {
-  	public static void d(String tag, String msg) {
-		LogManager.getInstance().d(tag, msg);
-	}
+
+    private static volatile boolean writeLogs = true;
+
+    public static void writeLogs(boolean writeLogs) {
+        LogUtil.writeLogs = writeLogs;
+    }
+
+    private static boolean showLogs(String tag, String msg) {
+        return writeLogs && !Util.isEmpty(tag) && !Util.isEmpty(msg);
+    }
+
+    public static void v(String tag, String msg) {
+        if (showLogs(tag, msg)) {
+            LogManager.getInstance().v(tag, msg);
+        }
+    }
+
+    public static void d(String tag, String msg) {
+        if (showLogs(tag, msg)) {
+            LogManager.getInstance().d(tag, msg);
+        }
+    }
+
+    public static void i(String tag, String msg) {
+        if (showLogs(tag, msg)) {
+            LogManager.getInstance().i(tag, msg);
+        }
+    }
+
+    public static void w(String tag, String msg) {
+        if (showLogs(tag, msg)) {
+            LogManager.getInstance().w(tag, msg);
+        }
+    }
+
+    public static void e(String tag, String msg) {
+        if (showLogs(tag, msg)) {
+            LogManager.getInstance().e(tag, msg);
+        }
+    }
+
 }
 ```
 
