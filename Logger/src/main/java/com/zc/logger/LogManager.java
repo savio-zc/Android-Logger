@@ -1,12 +1,13 @@
 package com.zc.logger;
 
+import android.text.TextUtils;
+
 import com.zc.logger.config.Config;
 import com.zc.logger.config.LogManagerConfig;
 import com.zc.logger.config.LogOption;
 import com.zc.logger.log.Logger;
 import com.zc.logger.model.LogMessage;
 import com.zc.logger.util.LogUtil;
-import com.zc.logger.util.Util;
 
 public class LogManager {
 	public static final String TAG = "LogManager";
@@ -88,7 +89,7 @@ public class LogManager {
 	}
 
 	private LogMessage getMessage(String text, LogOption local) {
-		if (Util.isEmpty(text) || local == null) {
+		if (TextUtils.isEmpty(text) || local == null) {
 			LogUtil.w(TAG, "local config: " + local);
 			return null;
 		}

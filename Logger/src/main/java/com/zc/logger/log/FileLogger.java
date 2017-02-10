@@ -1,6 +1,7 @@
 package com.zc.logger.log;
 
 import android.os.Handler;
+import android.text.TextUtils;
 
 import com.zc.logger.LogManager;
 import com.zc.logger.config.LogManagerConfig;
@@ -10,7 +11,6 @@ import com.zc.logger.format.Formatter;
 import com.zc.logger.model.LogMessage;
 import com.zc.logger.util.CompressUtil;
 import com.zc.logger.util.LogUtil;
-import com.zc.logger.util.Util;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -36,7 +36,7 @@ public class FileLogger extends BaseLogger {
             return true;
         }
         final String rootPath = global.getFilePath();
-        if (Util.isEmpty(rootPath)) {
+        if (TextUtils.isEmpty(rootPath)) {
             LogUtil.w(TAG, "filePath: " + rootPath);
             return true;
         }
@@ -46,7 +46,7 @@ public class FileLogger extends BaseLogger {
             return true;
         }
         final String line = formatter.format(message);
-        if (Util.isEmpty(line)) {
+        if (TextUtils.isEmpty(line)) {
             LogUtil.w(TAG, "line: " + line);
             return true;
         }
@@ -141,7 +141,7 @@ public class FileLogger extends BaseLogger {
     }
 
     private static void appendLine(File file, String line) {
-        if (file == null || Util.isEmpty(line)) {
+        if (file == null || TextUtils.isEmpty(line)) {
             return;
         }
         PrintWriter out = null;
