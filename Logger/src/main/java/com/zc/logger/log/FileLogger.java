@@ -23,19 +23,31 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 public class FileLogger extends BaseLogger {
-    public static final String TAG = LogManager.TAG + ":FileLogger";
+    private static final String TAG = LogManager.TAG + ":FileLogger";
 
     private static final String FILE_NAME = "logger.log";
     private static final String ZIP_FILE_NAME = "logger.zip";
     private static final String PATH_SINGLE = "single";
     private static final String PATH_MULTIPLE = "multiple";
 
+    protected String getRootPath(LogManagerConfig global) {
+        return global.getFilePath();
+    }
+
+    protected String getFileName() {
+        return FILE_NAME;
+    }
+
+    protected String getZipFileName() {
+        return ZIP_FILE_NAME;
+    }
+
     @Override
     public boolean log(final LogMessage message, final LogOption local, final LogManagerConfig global) {
         if (super.log(message, local, global)) {
             return true;
         }
-        final String rootPath = global.getFilePath();
+        final String rootPath = getRootPath(global);
         if (TextUtils.isEmpty(rootPath)) {
             LogUtil.w(TAG, "filePath: " + rootPath);
             return true;
@@ -46,8 +58,9 @@ public class FileLogger extends BaseLogger {
             return true;
         }
         final String line = formatter.format(message);
-        if (TextUtils.isEmpty(line)) {
-            LogUtil.w(TAG, "line: " + line);
+        final Throwable error = message.getThrowable();
+        if (TextUtils.isEmpty(line) && error == null) {
+            LogUtil.w(TAG, "line: " + line + ", throwable: " + error);
             return true;
         }
         final Executor executor = global.getExecutor();
@@ -70,7 +83,7 @@ public class FileLogger extends BaseLogger {
                 // delete useless files to make sure file level take effect
                 ArrayList<File> remains = new ArrayList<File>();
                 for (int i = 0; i < fileLevel; i++) {
-                    remains.add(new File(multipleDir, FILE_NAME + "." + i));
+                    remains.add(new File(multipleDir, getFileName() + "." + i));
                 }
                 File[] exits = multipleDir.listFiles();
                 if (exits != null) {
@@ -81,22 +94,22 @@ public class FileLogger extends BaseLogger {
                     }
                 }
                 // print log to multiple files
-                final File firstFile = new File(multipleDir, FILE_NAME + "." + 0);
+                final File firstFile = new File(multipleDir, getFileName() + "." + 0);
                 if (firstFile.length() + lineSize <= fileSize) {
-                    appendLine(firstFile, line);
+                    appendLine(firstFile, line, error);
                 } else {
                     for (int i = 0; i < fileLevel; i++) {
-                        final File file = new File(multipleDir, FILE_NAME + "." + i);
+                        final File file = new File(multipleDir, getFileName() + "." + i);
                         if (!file.exists() || (i == fileLevel - 1)) {
                             if (i == fileLevel - 1) {
                                 file.delete();
                             }
                             for (int j = i - 1; j >= 0; j--) {
-                                final File oldFile = new File(multipleDir, FILE_NAME + "." + j);
-                                final File newFile = new File(multipleDir, FILE_NAME + "." + (j + 1));
+                                final File oldFile = new File(multipleDir, getFileName() + "." + j);
+                                final File newFile = new File(multipleDir, getFileName() + "." + (j + 1));
                                 oldFile.renameTo(newFile);
                             }
-                            appendLine(firstFile, line);
+                            appendLine(firstFile, line, error);
                         }
                     }
                 }
@@ -114,11 +127,11 @@ public class FileLogger extends BaseLogger {
                 if (!singleDir.exists()) {
                     singleDir.mkdirs();
                 }
-                final File singleFile = new File(singleDir, FILE_NAME);
+                final File singleFile = new File(singleDir, getFileName());
                 if (singleFile.length() + lineSize <= fileLevel * fileSize) {
-                    appendLine(singleFile, line);
+                    appendLine(singleFile, line, error);
                 } else {
-                    final File zipFile = new File(rootPath, ZIP_FILE_NAME);
+                    final File zipFile = new File(rootPath, getZipFileName());
                     zipFile.delete();
                     CompressUtil.zip(zipFile, singleFile);
                     for (final OnFileFullListener l : listeners) {
@@ -133,28 +146,33 @@ public class FileLogger extends BaseLogger {
                         }
                     }
                     singleFile.delete();
-                    appendLine(singleFile, line);
+                    appendLine(singleFile, line, error);
                 }
             }
         });
         return true;
     }
 
-    private static void appendLine(File file, String line) {
-        if (file == null || TextUtils.isEmpty(line)) {
+    private static void appendLine(File file, String line, Throwable t) {
+        if (file == null) {
             return;
         }
         PrintWriter out = null;
         try {
             out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
-            out.println(line);
+            if (!TextUtils.isEmpty(line)) {
+                out.println(line);
+            }
+            if (t != null) {
+                t.printStackTrace(out);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (out != null) {
+                out.flush();
                 out.close();
             }
         }
     }
-
 }

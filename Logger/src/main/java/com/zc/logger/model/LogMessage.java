@@ -5,6 +5,7 @@ import com.zc.logger.util.CalendarUtil;
 
 public class LogMessage {
 
+	private Throwable mError;
 	private long mTime; // in ms
 	private int mPID;
 	private int mTID;
@@ -13,6 +14,10 @@ public class LogMessage {
 	private String mText;
 
 	private int mLevel;
+
+    public Throwable getThrowable() {
+        return mError;
+    }
 
 	public String getText() {
 		return mText;
@@ -49,6 +54,10 @@ public class LogMessage {
 	public String getLevelString() {
 		return Config.levelString(getLevel());
 	}
+
+    public void setThrowable(Throwable t) {
+        this.mError = t;
+    }
 
 	public void setText(String text) {
 		mText = text;

@@ -4,8 +4,6 @@ import com.zc.logger.model.LogMessage;
 
 public class DefaultFormatter implements Formatter {
 
-    private static final String SEPARATOR = " ";
-
     @Override
     public String format(LogMessage message) {
         if (message == null) {

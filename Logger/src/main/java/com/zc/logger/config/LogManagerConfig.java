@@ -5,8 +5,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.github.anrwatchdog.ANRWatchDog;
+import com.zc.logger.ANRHandler;
+import com.zc.logger.CrashHandler;
 import com.zc.logger.format.DefaultFormatter;
 import com.zc.logger.format.Formatter;
+import com.zc.logger.log.ANRFileLogger;
+import com.zc.logger.log.CrashFileLogger;
 import com.zc.logger.log.Logger;
 import com.zc.logger.model.LogModule;
 import com.zc.logger.util.LogUtil;
@@ -157,6 +162,7 @@ public class LogManagerConfig {
     }
 
     public static class Builder {
+
         private int minLevel = Config.LEVEL_VERBOSE;
         private int maxLevel = Config.LEVEL_ASSERT;
 
@@ -209,6 +215,47 @@ public class LogManagerConfig {
         public Builder addLogger(Logger logger) {
             if (logger != null && !this.loggers.contains(logger)) {
                 this.loggers.add(logger);
+            }
+            return this;
+        }
+
+        public Builder enableANR(boolean enable) {
+            Logger anrLogger = null;
+            for (Logger logger : this.loggers) {
+                if (logger instanceof ANRFileLogger) {
+                    anrLogger = logger;
+                }
+            }
+            if (enable) {
+                if (anrLogger == null) {
+                    addLogger(new ANRFileLogger());
+                    new ANRWatchDog(5000).setReportMainThreadOnly().setANRListener(new ANRHandler()).start();
+                }
+            } else {
+                if (anrLogger != null) {
+                    this.loggers.remove(anrLogger);
+                }
+            }
+            return this;
+        }
+
+        public Builder enableCrash(boolean enable) {
+            Logger crashLogger = null;
+            for (Logger logger : this.loggers) {
+                if (logger instanceof CrashFileLogger) {
+                    crashLogger = logger;
+                }
+            }
+            if (enable) {
+                if (crashLogger == null) {
+                    addLogger(new CrashFileLogger());
+                    Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
+                }
+            } else {
+                if (crashLogger != null) {
+                    this.loggers.remove(crashLogger);
+                    Thread.setDefaultUncaughtExceptionHandler(null);
+                }
             }
             return this;
         }

@@ -19,7 +19,7 @@ import java.io.File;
 public class HomeApplication extends Application {
     public static final String TAG = "HomeApplication";
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     @Override
     public void onCreate() {
@@ -48,6 +48,8 @@ public class HomeApplication extends Application {
                 .formatter(new DefaultFormatter()) // log format is the same as adb logcat
                 .addLogger(new FileLogger()) // print log to file
                 .addLogger(new ConsoleLogger()) // print log to console
+                .enableANR(true)//print anr log to file
+                .enableCrash(true)//print crash log to file
                 .build();
         LogManager.getInstance().init(config);
     }

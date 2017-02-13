@@ -19,18 +19,19 @@ public class ConsoleLogger extends BaseLogger {
         final int level = local.getLevel();
         final String tag = local.getTag();
         final String msg = message.getText();
+        final Throwable t = message.getThrowable();
         if (level >= Config.LEVEL_VERBOSE && level < Config.LEVEL_DEBUG) {
-            Log.v(tag, msg);
+            Log.v(tag, msg, t);
         } else if (level < Config.LEVEL_INFO) {
-            Log.d(tag, msg);
+            Log.d(tag, msg, t);
         } else if (level < Config.LEVEL_WARN) {
-            Log.i(tag, msg);
+            Log.i(tag, msg, t);
         } else if (level < Config.LEVEL_ERROR) {
-            Log.w(tag, msg);
+            Log.w(tag, msg, t);
         } else if (level < Config.LEVEL_ASSERT) {
-            Log.e(tag, msg);
+            Log.e(tag, msg, t);
         } else {
-            Log.wtf(tag, msg);
+            Log.wtf(tag, msg, t);
         }
         return true;
     }

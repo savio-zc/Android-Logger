@@ -4,6 +4,8 @@ import com.zc.logger.model.LogMessage;
 
 public interface Formatter {
 
-	public String format(LogMessage message);
+    String SEPARATOR = " ";
+
+    String format(LogMessage message);
 
 }

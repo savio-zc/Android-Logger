@@ -7,8 +7,8 @@ import com.zc.logger.model.LogMessage;
 import com.zc.logger.model.LogModule;
 import com.zc.logger.util.LogUtil;
 
-public class BaseLogger implements Logger {
-    public static final String TAG = LogManager.TAG + ":BaseLogger";
+class BaseLogger implements Logger {
+    private static final String TAG = LogManager.TAG + ":BaseLogger";
 
     @Override
     public boolean log(LogMessage message, LogOption local, LogManagerConfig global) {
