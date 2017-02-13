@@ -5,13 +5,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.github.anrwatchdog.ANRWatchDog;
-import com.zc.logger.ANRHandler;
-import com.zc.logger.CrashHandler;
 import com.zc.logger.format.DefaultFormatter;
 import com.zc.logger.format.Formatter;
-import com.zc.logger.log.ANRFileLogger;
-import com.zc.logger.log.CrashFileLogger;
 import com.zc.logger.log.Logger;
 import com.zc.logger.model.LogModule;
 import com.zc.logger.util.LogUtil;
@@ -79,7 +74,7 @@ public class LogManagerConfig {
         return mMaxLevel;
     }
 
-    public boolean enableModuleFilter() {
+    public boolean moduleFilterEnabled() {
         return mEnableModuleFilter;
     }
 
@@ -98,6 +93,14 @@ public class LogManagerConfig {
             return null;
         }
         return mModules.get(tag);
+    }
+
+    public boolean ANREnabled() {
+        return getModule(Config.TAG_ANR) != null;
+    }
+
+    public boolean crashEnabled() {
+        return getModule(Config.TAG_CRASH) != null;
     }
 
     public Formatter getFormatter() {
@@ -202,6 +205,16 @@ public class LogManagerConfig {
             return this;
         }
 
+        public Builder enableANR() {
+            addModule(new LogModule(Config.TAG_ANR, Config.LEVEL_ASSERT, Config.LEVEL_ASSERT));
+            return this;
+        }
+
+        public Builder enableCrash() {
+            addModule(new LogModule(Config.TAG_CRASH, Config.LEVEL_ASSERT, Config.LEVEL_ASSERT));
+            return this;
+        }
+
         public Builder enableModuleFilter(boolean enable) {
             this.enableModuleFilter = enable;
             return this;
@@ -215,47 +228,6 @@ public class LogManagerConfig {
         public Builder addLogger(Logger logger) {
             if (logger != null && !this.loggers.contains(logger)) {
                 this.loggers.add(logger);
-            }
-            return this;
-        }
-
-        public Builder enableANR(boolean enable) {
-            Logger anrLogger = null;
-            for (Logger logger : this.loggers) {
-                if (logger instanceof ANRFileLogger) {
-                    anrLogger = logger;
-                }
-            }
-            if (enable) {
-                if (anrLogger == null) {
-                    addLogger(new ANRFileLogger());
-                    new ANRWatchDog(5000).setReportMainThreadOnly().setANRListener(new ANRHandler()).start();
-                }
-            } else {
-                if (anrLogger != null) {
-                    this.loggers.remove(anrLogger);
-                }
-            }
-            return this;
-        }
-
-        public Builder enableCrash(boolean enable) {
-            Logger crashLogger = null;
-            for (Logger logger : this.loggers) {
-                if (logger instanceof CrashFileLogger) {
-                    crashLogger = logger;
-                }
-            }
-            if (enable) {
-                if (crashLogger == null) {
-                    addLogger(new CrashFileLogger());
-                    Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
-                }
-            } else {
-                if (crashLogger != null) {
-                    this.loggers.remove(crashLogger);
-                    Thread.setDefaultUncaughtExceptionHandler(null);
-                }
             }
             return this;
         }
@@ -291,6 +263,5 @@ public class LogManagerConfig {
         public LogManagerConfig build() {
             return new LogManagerConfig(this);
         }
-
     }
 }

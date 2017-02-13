@@ -2,6 +2,10 @@ package com.zc.logger.config;
 
 public class Config {
 
+    // Tag
+    public static final String TAG_ANR = "[ANR]";
+    public static final String TAG_CRASH = "[Crash]";
+
     // Level
     public static final int LEVEL_VERBOSE = 0;
     public static final int LEVEL_DEBUG = 100;

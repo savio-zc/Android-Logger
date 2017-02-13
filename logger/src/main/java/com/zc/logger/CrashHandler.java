@@ -7,9 +7,10 @@ import com.zc.logger.config.LogOption;
  * Created by zzc on 2017/2/11.
  */
 
-public class CrashHandler implements Thread.UncaughtExceptionHandler {
+class CrashHandler implements Thread.UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-        LogManager.getInstance().log(ex, thread.toString(), new LogOption.Builder("[Crash]", Config.LEVEL_ASSERT).build(), null);
+        LogOption local = new LogOption.Builder(Config.TAG_CRASH, Config.LEVEL_ASSERT).build();
+        LogManager.getInstance().log(ex, thread.toString(), local, null);
     }
 }

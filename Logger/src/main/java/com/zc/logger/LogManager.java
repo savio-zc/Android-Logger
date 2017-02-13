@@ -2,6 +2,7 @@ package com.zc.logger;
 
 import android.text.TextUtils;
 
+import com.github.anrwatchdog.ANRWatchDog;
 import com.zc.logger.config.Config;
 import com.zc.logger.config.LogManagerConfig;
 import com.zc.logger.config.LogOption;
@@ -14,6 +15,7 @@ public class LogManager {
 
 //	private static final String ERROR_NOT_INIT = "LogManager must be init with non-null LogManagerConfig before using";
 
+    private ANRWatchDog mANRThread;
     private LogManagerConfig mConfig;
 
     private static final LogManager INSTANCE = new LogManager();
@@ -26,7 +28,19 @@ public class LogManager {
     }
 
     public void init(LogManagerConfig config) {
+        if (config == null) {
+            return;
+        }
         mConfig = config;
+        if (mConfig.ANREnabled() && mANRThread == null) {
+            mANRThread = new ANRWatchDog(5000);
+            mANRThread.setReportMainThreadOnly();
+            mANRThread.setANRListener(new ANRHandler());
+            mANRThread.start();
+        }
+        if (mConfig.crashEnabled()) {
+            Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
+        }
     }
 
     public String getFilePath() {

@@ -17,7 +17,7 @@ class BaseLogger implements Logger {
             return true;
         }
         final int level = local.getLevel();
-        if (global.enableModuleFilter()) {
+        if (global.moduleFilterEnabled()) {
             final int moduleCount = global.getModuleCount();
             if (moduleCount <= 0) {
                 LogUtil.w(TAG, "moduleCount: " + moduleCount);

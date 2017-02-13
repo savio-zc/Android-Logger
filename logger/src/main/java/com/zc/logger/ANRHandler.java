@@ -9,9 +9,10 @@ import com.zc.logger.config.LogOption;
  * Created by zzc on 2017/2/11.
  */
 
-public class ANRHandler implements ANRWatchDog.ANRListener {
+class ANRHandler implements ANRWatchDog.ANRListener {
     @Override
     public void onAppNotResponding(ANRError error) {
-        LogManager.getInstance().log(error, null, new LogOption.Builder("[ANR]", Config.LEVEL_ASSERT).build(), null);
+        LogOption local = new LogOption.Builder(Config.TAG_ANR, Config.LEVEL_ASSERT).build();
+        LogManager.getInstance().log(error, Thread.currentThread().toString(), local, null);
     }
 }
