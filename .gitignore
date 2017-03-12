@@ -12,7 +12,7 @@ local.properties
 captures/
 
 # Intellij
-#*.iml
+*.iml
 .idea/
 
 #Freeline
