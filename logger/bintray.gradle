@@ -1,0 +1,170 @@
+// https://github.com/bintray/gradle-bintray-plugin
+apply plugin: 'com.jfrog.bintray'
+// https://github.com/dcendents/android-maven-gradle-plugin
+// https://github.com/msdx/gradle-publish
+apply plugin: 'com.github.dcendents.android-maven'
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += configurations.compile
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+javadoc {
+    options{
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+//        links "https://androiddoc.qiniudn.com/reference/"
+        title "$PROJECT_NAME $PROJECT_VERSION"
+    }
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name project.name
+            description PROJECT_DESCRIPTION
+            url PROJECT_WEBSITE_URL
+            inceptionYear '2016'
+
+            packaging PROJECT_PACKAGING
+            groupId PROJECT_GROUP
+            artifactId PROJECT_NAME
+            version PROJECT_VERSION
+
+            licenses {
+                license {
+                    name PROJECT_LICENSE_NAME
+                    url PROJECT_LICENSE_URL
+                    distribution 'repo'
+                }
+            }
+            scm {
+                connection PROJECT_VCS_URL
+                url PROJECT_WEBSITE_URL
+            }
+            developers {
+                developer {
+                    id DEVELOPER_ID
+                    name DEVELOPER_NAME
+                    email DEVELOPER_EMAIL
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives'] //When uploading configuration files
+    // - OR -
+//    publications = ['MyPublication'] //When uploading Maven-based publication files
+    // - AND/OR -
+//    filesSpec { //When uploading any arbitrary files ('filesSpec' is a standard Gradle CopySpec)
+//        from 'arbitrary-files'
+//        into 'standalone_files/level1'
+//        rename '(.+)\\.(.+)', '$1-suffix.$2'
+//    }
+    dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
+    publish = true //[Default: false] Whether version should be auto published after an upload
+    override = false //[Default: false] Whether to override version artifacts already published
+    //Package configuration. The plugin will use the repo and name properties to check if the package already exists. In that case, there's no need to configure the other package properties (like userOrg, desc, etc).
+    pkg {
+        repo = 'maven'
+        name = project.name
+        userOrg = DEVELOPER_ID //An optional organization name when the repo belongs to one of the user's orgs
+        desc = PROJECT_DESCRIPTION
+        websiteUrl = PROJECT_WEBSITE_URL
+        issueTrackerUrl = PROJECT_ISSUE_TRACKER_URL
+        vcsUrl = PROJECT_VCS_URL
+        licenses = ['Apache-2.0']
+        labels = ['Android', 'Logger', 'Log', 'ANR', 'Crash']
+        publicDownloadNumbers = true
+//        attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
+
+        githubRepo = 'savio-zc/Android-Logger' //Optional Github repository
+        githubReleaseNotesFile = 'README.md' //Optional Github readme file
+
+        //Optional version descriptor
+        version {
+            name = PROJECT_VERSION //Bintray logical version name
+            desc = PROJECT_VERSION_DESCRIPTION //Optional - Version-specific description'
+//            released = 2017-03-19 //Optional - Date of the version release. 2 possible values: date in the format of 'yyyy-MM-dd'T'HH:mm:ss.SSSZZ' OR a java.util.Date instance
+            vcsTag = PROJECT_VERSION
+//            attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin'] //Optional version-level attributes
+            //Optional configuration for GPG signing
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+                passphrase = properties.getProperty("bintray.gpg.password") //Optional. The passphrase for GPG signing'
+            }
+            //Optional configuration for Maven Central sync of the version
+            mavenCentralSync {
+                sync = false //[Default: true] Determines whether to sync the version to Maven Central.
+                user = properties.getProperty("sonatype.user") //OSS user token: mandatory
+                password = properties.getProperty("sonatype.password") //OSS user password: mandatory
+                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+            }
+        }
+    }
+}
+
+//// Create the pom configuration:
+//def pomConfig = {
+//    licenses {
+//        license {
+//            name PROJECT_LICENSE_NAME
+//            url PROJECT_LICENSE_URL
+//            distribution "repo"
+//        }
+//    }
+//    developers {
+//        developer {
+//            id DEVELOPER_ID
+//            name DEVELOPER_NAME
+//            email DEVELOPER_EMAIL
+//        }
+//    }
+//}
+//
+//// Create the publication with the pom configuration:
+//publishing {
+//    publications {
+//        MyPublication(MavenPublication) {
+//            from components.java
+//            artifact sourcesJar
+//            artifact javadocJar
+//            groupId PROJECT_GROUP
+//            artifactId PROJECT_NAME
+//            version PROJECT_VERSION
+//            pom.withXml {
+//                def root = asNode()
+//                root.appendNode('description', PROJECT_DESCRIPTION)
+//                root.appendNode('name', PROJECT_NAME)
+//                root.appendNode('url', PROJECT_WEBSITE_URL)
+//                root.children().last() + pomConfig
+//            }
+//        }
+//    }
+//}
