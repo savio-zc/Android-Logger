@@ -7,7 +7,7 @@ I developed Android-Logger to solve the problem described above. For one thing, 
 
 ### 1.2 Benefits
 Using Android-Logger, you can:  
-1. print your logs into your own files on sdcard;  
+1. print your logs (including ANR and crash log) into your own files on sdcard;  
 2. pull your log files easily from any android device;  
 3. upload your log files onto your servers for later analysis.
 
@@ -19,14 +19,14 @@ Using Android-Logger, you can:
 Use Gradle:
 ```groovy
 dependencies {
-    compile 'com.github.savio-zc:Android-Logger:1.0.0'
+    compile 'com.github.savio-zc:logger:1.0.0'
 }
 ```
 or Maven:
 ```xml
 <dependency>
   <groupId>com.github.savio-zc</groupId>
-  <artifactId>Android-Logger</artifactId>
+  <artifactId>logger</artifactId>
   <version>1.0.0</version>
 </dependency>
 ```
