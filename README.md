@@ -19,7 +19,7 @@ Using Android-Logger, you can:
 Use Gradle:
 ```groovy
 dependencies {
-    compile 'com.github.savio-zc:logger:1.0.0'
+    compile 'com.github.savio-zc:logger:1.1.0'
 }
 ```
 or Maven:
@@ -27,7 +27,7 @@ or Maven:
 <dependency>
   <groupId>com.github.savio-zc</groupId>
   <artifactId>logger</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
